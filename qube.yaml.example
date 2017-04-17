@@ -1,32 +1,67 @@
-id: 1ae746c1-0704-45aa-a604-b331b392286c
-version: v2
-name: spring-new-everything
-apptype: api
+---
+name: omartestpy2
 language: python
-containerName: spring-new-everything
-toolchain:
-  id: 58e5d97bacac5a001de2b937
-  name: Qubeship-Python-Toolchain
-opinion:
-  id: 58e3fb3ce2a801000e8cb440
-  name: Qubeship Out of the Box Opinion
-endpoint:
-  id: 58e1cbf02a0603000b3e58a4
-  name: Qubeship Sandbox Cluster
-  type: target
-variables:
-  - name: APP_VERSION
-    value: v0.1
+pipeline: build_bake_test_deployment:v0.1
+security:
+  keys_loc: "conf/"
 build:
-  compile:
-    publish:
-     - dist/
+  image:
+    name: python:3.5-onbuild
+    onbuild:
+      - scripts/build.sh
+  publish_artifact: dist/
+  lint: true
 bake:
-  skip: false
+  strategy: docker
+  script: Dockerfile
+  repositories:
+    - name: google
+      prefix: gcr.io/qubeship
+      type: gcr
 test:
   skip: true
-deploy_to_qa:
-  skip: true
-deploy_to_prod:
-  skip: false
-
+  functional:
+    provider: qubeship-sg
+ports:
+  container_ports:
+    - containerPort: 8443
+      name: https
+      protocol: TCP
+    - containerPort: 8191
+      name: http
+      protocol: TCP
+  service_ports:
+    - name: "http"
+      protocol: "TCP"
+      port: 80
+      targetPort: 8191
+    - name: "https"
+      protocol: "TCP"
+      port: 443
+      targetPort: 8443
+deployment:
+  continuous_deployment: true
+  environments:
+    prod:
+      - type: qubeship_managed
+        id: "k8s2"
+        template_id: qube_qubeship_apis
+        srcRepo: google
+environment_variables:
+  env:
+  - name: DEFAULT_LISTENER_PORT
+    value: "8191"
+  - name: AUTH_API_URL
+    value: https://api.qubeship.io/v1/auth
+  - name: VAULT_ADDR
+    value: https://vault.qubeship.io
+  - name: OMARTESTPY2_MONGOALCHEMY_SERVER
+    value: $(MONGO_SERVICE_HOST)
+  - name: OMARTESTPY2_MONGOALCHEMY_PORT
+    value: $(MONGO_SERVICE_PORT)
+  - name: OMARTESTPY2_MONGOALCHEMY_DATABASE
+    value: toolchain
+  - name: CI_ADDR
+    value: https://jenkins.qubeship.io
+  - name: CI_USERNAME
+    value: jenkins

@@ -1,5 +1,5 @@
-from qube.src.api.swagger_models.hello \
-    import HelloModel, HelloModelPost
+from qube.src.api.swagger_models.omartestpy2 \
+    import omartestpy2Model, omartestpy2ModelPost
 
 """
 swagger parameters definitions
@@ -33,7 +33,7 @@ body_ex = {
     'name': 'body',
     'description': 'Request body',
     'in': 'body',
-    'schema': HelloModel,
+    'schema': omartestpy2Model,
     'required': True,
 }
 
@@ -41,7 +41,7 @@ body_post_ex = {
     'name': 'body',
     'description': 'Request body',
     'in': 'body',
-    'schema': HelloModelPost,
+    'schema': omartestpy2ModelPost,
     'required': True,
 }
 
@@ -49,6 +49,6 @@ body_put_ex = {
     'name': 'body',
     'description': 'Request body',
     'in': 'body',
-    'schema': HelloModelPost,
+    'schema': omartestpy2ModelPost,
     'required': True,
 }
