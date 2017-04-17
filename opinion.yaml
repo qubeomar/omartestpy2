@@ -1,0 +1,40 @@
+---
+id: "o1234567890"
+name: "Qubeship Out of the box opinion"
+description: "out-of-box opinion"
+visibility: "public"
+graml:
+  version: 1.0
+graph:
+  build:
+    has:
+      - compile
+      - unittest
+      - static_code_analysis
+      - publish
+    on_error:
+      - notify
+    next: bake
+  bake:
+    has:
+      - docker_build
+      - harden
+      - publish
+    on_error:
+      - notify
+    next: deploy_to_qa
+  deploy_to_qa:
+    has:
+      - release
+      - functional_test
+      - manual_approve
+      - publish
+    on_error:
+      - notify
+    next: deploy_to_prod
+  deploy_to_prod:
+    has:
+      - release
+      - notify
+    on_error:
+      - notify
